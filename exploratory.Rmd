@@ -1,0 +1,369 @@
+---
+title: "Exploratory Data Analysis"
+author: |
+        | Felipe J Colon-Gonzalez
+        | School of Environmental Sciences
+date: "8-9 November 2016"
+output: 
+     ioslides_presentation:
+          logo: uea_logo.png
+---
+
+# Part III. Exploratory Data Analysis
+
+## Load a dataset
+- Let's work with the `mtcars` set (*Motor Trend Car Road Tests*) from the 
+`datasets` package
+- Load the data and look at the dimensions and structure of the set
+- Explore the description of the variables in the set
+
+```r
+> require(datasets)
+
+> data(mtcars)
+
+> ?mtcars
+```
+
+## Explore the set
+- You can explore the top and bottom six rows using the `head()` and `tail()`
+functions
+- The number of rows can be modified with the argument `n=nrows` where nrows
+is the number of rows you want to look at
+- You can obtain information about each variable with `str()`
+
+```r
+ > str(mtcars)
+'data.frame':	32 obs. of  11 variables:
+ $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
+ $ cyl : num  6 6 4 6 8 6 8 4 4 6 ...
+ $ disp: num  160 160 108 258 360 ...
+```
+
+
+## Summary statistics
+* Get summary statistics with the `summary()` function
+
+```r
+> summary(mtcars)
+     mpg             cyl             disp             hp          
+ Min.   :10.40   Min.   :4.000   Min.   : 71.1   Min.   : 52.0   
+ 1st Qu.:15.43   1st Qu.:4.000   1st Qu.:120.8   1st Qu.: 96.5  
+ Median :19.20   Median :6.000   Median :196.3   Median :123.0  
+ Mean   :20.09   Mean   :6.188   Mean   :230.7   Mean   :146.7  
+ 3rd Qu.:22.80   3rd Qu.:8.000   3rd Qu.:326.0   3rd Qu.:180.0  
+ Max.   :33.90   Max.   :8.000   Max.   :472.0   Max.   :335.0  
+ [... truncated]
+ 
+```
+
+## Summary statistics
+* You can also get summary statistics independently using:
+       - `mean()`
+       - `sd()`
+       - `var()`
+       - `median()`
+       - `range()`
+
+
+## Frequency tables
+* Create frequency tables with the `table()` function
+
+```r
+> table(mtcars$cyl)  # Number of cars by number of cylinders
+ 4  6  8 
+11  7 14 
+
+> with(mtcars, table(cyl, gear))  # Cars by cylinders and gears
+   gear
+cyl  3  4  5
+  4  1  8  2
+  6  2  4  1
+  8 12  0  2
+```
+
+
+## Frequency tables
+- 3 way contingency tables can be obtained with `ftable()`
+
+```r
+> ftable(mtcars[c("cyl", "am", "gear")])
+       gear  3  4  5
+cyl am              
+4   0        1  2  0
+    1        0  6  2
+6   0        2  2  0
+    1        0  2  1
+8   0       12  0  0
+    1        0  0  2
+```
+
+
+## Frequency tables
+- The default `table()` call does not display information for missing data
+- Frequencies for missing values can be obtained with `useNA="always"`
+
+```r
+> mtcars[1,2] <- NA
+> table(mtcars$cyl)
+
+ 4  6  8 
+11  6 14 
+
+> table(mtcars$cyl, useNA="always")
+
+   4    6    8 <NA> 
+  11    6   14    1 
+```
+
+
+## Quantiles
+- Sample quantiles for specific probabilities can be obtained with `quantile()` 
+
+```r
+> quantile(mtcars$mpg)        # Default
+    0%    25%    50%    75%   100% 
+10.400 15.425 19.200 22.800 33.900 
+ 
+> quantile(mtcars$mpg, probs=c(0.1, 0.5, 0.9))
+  10%   50%   90% 
+14.34 19.20 30.09 
+```
+<br>
+- **Now, try other quantiles**
+
+## Evaluate logical vectors
+- You may want to evaluate if a particular characteristic applies to some or 
+all values in a vector
+
+```r
+> any(mtcars$mpg > 30)
+[1] TRUE
+
+> all(mtcars$mpg < 32)
+[1] FALSE
+```
+
+# Exploratory plots
+
+## Exploratory plots
+- Simple exploratory plots can be easily generated using generic functions
+such as `plot()`, `barplot()`, `hist()` and `boxplot()`
+- Plots can be easily annotated and customized 
+- One-dimension and two-dimensional plots may be generated
+
+
+## Exploratory plots
+- When no plot type is specified, R will use the plot type it thinks is most 
+adequate for your data
+
+```{r}
+with(mtcars, plot(wt, mpg)) 
+```
+
+## Exploratory plots
+
+```{r}
+data(AirPassengers)
+plot(AirPassengers)
+```
+
+
+## Customizing plots
+- You may want your plot to show different colours based on a data feature.
+- Using the `mtcars` dataset I indicate whether data correspond to automatic 
+or manual cars
+
+```{r, fig.height=3.5}
+with(mtcars, plot(wt, mpg, pch=19, col=factor(am))) # ?pch
+```
+
+## Customizing plots
+- You can also change the labels for the axes
+
+```{r, fig.height=3.5}
+with(mtcars, plot(wt, mpg, pch=19, col=factor(am), 
+                  xlab="Weight", ylab="Miles per gallon"))
+```
+
+
+## Customizing plots
+- Change the size of the points (equally or based on a condition)
+
+```{r, fig.height=3.5}
+with(mtcars, plot(wt, mpg, pch=19, col=factor(am), 
+                  xlab="Weight", ylab="Miles per gallon",
+                  cex=carb))
+```
+
+## Customizing plots
+- Add a title
+
+```{r, fig.height=3.5}
+with(mtcars, plot(wt, mpg, pch=19, col=factor(am), 
+                  xlab="Weight", ylab="Miles per gallon",
+                  cex=carb, main="My first plot"))
+```
+
+
+## Customizing plots
+- And a legend!
+
+```{r, fig.height=3.5}
+with(mtcars, plot(wt, mpg, pch=19, col=factor(am), 
+                  xlab="Weight", ylab="Miles per gallon",
+                  cex=carb, main="My first plot"))
+legend("topright", legend=unique(mtcars$am), pch=19,
+       col=c("black", "red"))
+```
+
+
+## Other plot types 
+- One-dimensional box and whisker 
+
+```{r}
+data("ToothGrowth")
+boxplot(ToothGrowth$len, col="blue")
+```
+
+
+## Two-dimensional box and whisker plots
+
+```{r}
+with(ToothGrowth, boxplot(len ~ supp, col=c("orange","blue")))
+```
+
+
+## Histogram
+
+```{r}
+x <- rnorm(1000)
+hist(x)
+```
+
+
+## Histogram
+
+```{r}
+hist(x, breaks=50, col="green")
+```
+
+
+## Bar plots
+
+```{r, fig.width=8,fig.height=5.5}
+set.seed(234); x <- rnorm(100)
+barplot(x, main="Random numbers")
+```
+
+
+## Scatter plot matrices
+
+```{r}
+pairs(mtcars[,3:6])
+```
+
+
+## Overlaying features
+- Vertical line
+
+```{r}
+hist(x, breaks=15, col="steelblue4")
+abline(v=median(x), col="tomato", lwd=6)
+```
+
+
+## Overlaying features
+- Horizontal dotted line
+
+```{r}
+with(ToothGrowth, boxplot(len ~ supp, 
+                          col=c("goldenrod","darkolivegreen")))
+abline(h=28, col="red3", lwd=3, lty=3)
+```
+
+
+## Conditional colours
+
+```{r, fig.width=8,fig.height=5.5}
+set.seed(234); x <- rnorm(100)
+barplot(x, main="Random numbers", col=ifelse(x<0, "blue", "red"))
+```
+
+
+
+## Multiple plots in one graphic device
+
+```{r, fig.height=4, fig.width=8}
+par(mfrow=c(1, 2)) # One device, one row, two columns
+with(mtcars, {
+       plot(wt, mpg, main="Weight vs. miles per gallon")
+       plot(hp, mpg, main="Horsepower vs. miles per gallon")
+})
+```
+
+
+## Graphic devices
+- You may open more than one screen devices at once
+       - On Mac the screen device is launched with `quartz()`
+       - On Windows, the command is `windows()`
+       - On Linux/Unix, the command is `x11()`  
+
+
+
+## Save plots to a file
+
+<br>
+```r
+> pdf("myplot.pdf")    # Opens graphics device in working directory
+
+> with(mtcars, plot(wt, mpg, pch=19, col=cyl, cex=2))
+
+> dev.off()            # Closes graphics device
+
+# Open the plot on your computer
+```
+<br>
+-  Now, explore other graphic devices and their options
+
+
+
+## Your turn!
+- Load the `mydata.csv` file
+- Compute **summary statistics** for both sulfate and nitrate measurements (are
+there any missing values?)
+- Create a subset called `mySubset` with no missing observations 
+- Compute a frequency table for each ID level on your subset
+- Set the dates in the dataset as R-dates
+- Generate a 2 panel plot with the histograms of sulfate and nitrate
+- Create a subset where all negative sulfate values are equal to zero and 
+plot sulfate values with colours by ID
+
+
+## To practice at your own pace
+
+- Install the interactive `swirl` package
+- Go through the `R programming` modules
+
+
+## Useful `R`esources
+[Coursera](https://www.coursera.org/)
+
+[DataCamp](https://www.datacamp.com/)
+
+[swirl](http://swirlstats.com/)
+
+[Institute for Digital Research and Education](http://www.ats.ucla.edu/stat/r/modules/)
+
+[Try R Code School](http://tryr.codeschool.com/)
+
+
+## References
+1. [R Programming for Data Science](https://leanpub.com/rprogramming) Peng (2016)
+2. [An introduction to R](https://cran.r-project.org/doc/manuals/r-release/R-intro.html) R Core Team (2016)
+3. [A Beginner's Guide to R](http://www.springer.com/us/book/9780387938363) Zuur et al., (2009)
+
+# End of Part III
+
+
+

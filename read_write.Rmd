@@ -1,0 +1,402 @@
+---
+title: "Reading and Manipulating Data"
+author: |
+        | Felipe J Colon-Gonzalez
+        | School of Environmental Sciences
+date: "8-9 November 2016"
+output: 
+     ioslides_presentation:
+          logo: uea_logo.png
+---
+
+# Part II. Reading and Manipulating Data
+
+## Overview
+1. The working directory
+2. Installing and loading packages
+3. Reading and writing tabular data
+4. Dates and times
+
+# 1. The Working Directory
+
+## The working directory
+- Typically you set up a working directory before analysing any data
+- The working directory is where `R` wwill find all files for reading and
+writing in your computer
+- You can ask `R` to tell you the location of current working directory with 
+`getwd()`
+     - The location of the working directory may change between users and 
+     between versions of the OS
+     - It **will also be different for different OS**
+- If you do not know the location of the working directory you may get errors
+in your computations or may store data into directories different to those you
+need/want
+
+
+## Example
+
+<br>
+```r
+> getwd()
+[1] "/Users/Felipe"       
+
+> read.table(mydata.csv)
+Error in read.table(mydata.csv) : object 'mydata.csv' not found
+```
+
+
+## Setting up the working directory
+- If you know where the desired file is stored, you can either copy the file into your
+working directory or change the working directory to the location of the file
+- The `setwd()` function allows you to set (modify) the working directory
+- The `list.files()` function gives you the names of all files in the wd
+- Use simple names and **avoid directory names that contain symbols such as**
+`*`, `&`, `$`, `£`, and so on 
+- The use of diacritical marks is also **not allowed**
+
+
+## Setting up the working directory
+- The name of the working directory **must be given in quotes**
+- **Unix** systems require the path to the directory written using backward slashes
+between levels
+       - `"/home/user/directory"` (*absolute path*) or 
+       - `"~/directory"`  (*relative path*)
+
+- **Windows** allows you define the paths with double forward slashes or single 
+backward slashes:
+       - `"C:\\home\\user\\directory"` or
+       - `"C:/home/user/directory"`
+
+## Example
+
+```r
+> setwd("/Users/Felipe/Documents/GitLab/Rprog/part2/")
+
+> dir()
+[1] "assets"     "index.html" "index.md"   "index.Rmd"  "libraries" 
+[6] "mydata.csv"
+
+> read.csv("mydata.csv")           # Now I can read the set
+        Date sulfate nitrate ID
+1 2003-01-01      NA      NA  1
+2 2003-01-02      NA      NA  1
+3 2003-01-03      NA      NA  1
+4 2003-01-04      NA      NA  1
+```
+
+
+## Creating subdirectories
+- `dir.create("newFolder")` creates a new subdirectory in the working
+directory
+
+```r
+> dir.create("test")
+> list.files()
+[1] "Desktop"
+[2] "Documents"
+[3] "Downloads"
+[4] "Dropbox"
+[5] "scratch"
+[6] "test"  
+
+```
+
+# 2. Installing and Loading Packages
+
+
+## R Packages
+* A **package** is a collection of programmed functions for specific tasks
+* There are two types of packages: 
+       - those that come with the base installation of R 
+       - those you must manually download and install
+* The so called `base` version contains the most common packages
+* The `installed.packages()` command lists all packages you have installed in 
+your R library
+* There are hundreds of user-contributed packages that are not part of
+the base installation, most of which are available through the 
+[CRAN website](https://cran.r-project.org/web/packages/available_packages_by_name.html).
+
+
+## Installing packages
+- The `install.packages("mypackage")` allows you to install a package 
+- The name of the package must be in quotes
+- Depending on the GUI of choice you may or may not be asked to select a 
+repository
+       - If asked, it is convenient to choose the mirror **geographically 
+closest to you** 
+- The web address of the repository can be included in the call
+- Multiple packages can be installed at a time
+
+```r
+install.packages("apt", repos="http://cran.rstudio.com/")
+```
+
+## Example
+
+![width](mirror.png)
+
+
+## Installing multiple packages at once
+- You may save some time and space 
+
+```r
+# Define *new* packages
+> pkglist <- c("ggplot2", "dplyr", "xtable")
+
+# Install packages
+> install.packages(pkglist, repos="http://cran.rstudio.com/")
+```
+
+## Getting around the Active Desktop
+
+- Installing packages within the AD could be a real pain
+- Using `.libPaths("path/to/desired/folder")` will store packages in your
+desired folder and prevent issues with the AD
+- The IT Help Desk may have a more suitable long-term solution
+
+```r
+# An example
+.libPaths(getwd())
+```
+
+## Loading packages and datasets
+* The `require()` and `library()` functions load any package
+* Some packages come with built-in datasets
+* Load datasets with the `data()` command
+* To unload a package use `detach("package:mypackage", unload=TRUE)`
+
+```r
+> require(maptools)
+Loading required package: maptools
+Checking rgeos availability: TRUE
+Attaching package: ‘maptools’
+The following object is masked from ‘package:sp’:
+    nowrapSpatialLines
+
+> data(wrld_simpl)
+> detach("package:maptools", unload=TRUE)
+
+```
+
+# 3. Reading and Writing Tabular Data
+
+
+## Reading and Writing data
+- Some of the most frequently used functions for reading data into R are 
+`read.table()` and `read.csv()`
+- The analogous functions for writing data to files are `write.table()` and 
+`write.csv`
+- These functions read data in to RAM, so there are issues with big sets
+
+
+## Reading data 
+- These are some (not all) important arguments for `read.table()` and
+`read.csv()`:
+       - `file`, the name of the file
+       - `header`, logical value indicating if the file has variable names as its
+       first line
+       - `sep`, a character indicating how the columns are separated
+       - `colClasses`, a character vector indicating the class of each column in 
+       the set 
+       - `skip`, the number of lines to skip before beginning to read data
+
+## Reading data 
+- `read.csv` is analogous to `read.table(file, sep=",")` but exclusively for .csv
+- Occasionally, values in the raw data have quotes which may cause numbers being 
+read as characters
+- To disable quoting, include `quote=""` as an argument on `read.csv()` or 
+`read.table()`
+
+
+## Reading small sets
+- For small to moderately sized datasets, you can usually call `read.table()` 
+or `read.csv()` without specifying any other arguments
+
+```r
+# Load the dummy dataset 
+mydata <- read.csv("mydata.csv")
+```
+
+- R will automatically:
+
+       - skip lines beginning with `"#"`
+       - figure out the number of rows (and how much memory needs to be 
+       allocated)
+       - figure out the type of variable in each column
+- Telling R all these things directly makes the code faster and more efficient
+
+
+## Reading large sets 
+- Specifying the `colClasses` option can make the code run **MUCH faster**, often 
+twice as fast 
+- To use this option, you need to know the class of each column
+- If all columns have the same class, happy times!
+- If not, there is a quick way to figure out the class of each column in the set
+
+
+## Reading large sets 
+
+```r
+# Load the Dummy data 2 
+> system.time(
+> myData <- read.csv("traffic.csv")
+> )
+   user  system elapsed 
+  5.380   0.000   5.294 
+  
+> sample   <- read.csv("traffic.csv", nrows=100)
+
+> classes  <- sapply(sample, class)
+
+> system.time(
+> myData2  <- read.csv("traffic.csv", colClasses=classes)
+> )                           
+   user  system elapsed  
+  3.482   0.000   3.437 
+```
+
+
+## Writing data
+* The `write.table()` and `write.csv()` functions take these important arguments:
+       - `x`, the object being written; preferably matrices or data frames
+       - `file`, the name of the file 
+       - `sep`, a character indicating how the columns are separated (for 
+       `write.csv` the default is a comma)
+       - `row.names`, logical value indicating whether row names are to be 
+       written (I normally set it to `FALSE`)
+
+## Writing data
+- Try the following on your console and explore the differences in the output
+
+```r
+> dfr <- data.frame(foo=1:4, bar=letters[1:4])
+
+> write.csv(x=dfr, file="mydata1.csv")
+
+> write.csv(x=dfr, file="mydata2.csv", row.names=FALSE)
+```
+
+## Reading data from other sources
+- R may is able to read and write many different types of data including, but 
+not restricted to:
+       - `.xls` and `.xlsx`
+       - `.sav`, `.mtp` , `.spt`, `.dta`
+       - `.nc`
+       - `.jpg`, `.tiff`, `.png`
+       - `.shp` 
+       - `.rds` 
+       - `JSON`, `html`, `SQL`
+       - and many more
+- **We will not cover these data types in this course**
+
+# 4. Dates and Times
+
+
+## Dates in R
+- Dates have the class `Date`
+- Dates are considered by R as the number of **days** since 1 Jan 1970
+- Typically, dates are written using numbers as follows "YYYY-MM-DD" (e.g.
+1970-01-01)
+
+
+## Dates
+- Dates may be coerced from character strings using `as.Date()` 
+
+```r
+> mydate <- as.Date("1970-01-01")
+
+> mydate
+[1] "1970-01-01"
+
+> class(mydate)
+[1] "Date"
+```
+
+
+## Dates
+- There some generic functions for dates
+       - `weekdays`: give the day of the week
+       - `months`: give the month as string
+       - `quarters`: give the quarter number ("Q1", "Q2", and so on)
+
+## Dates
+
+```r
+> weekdays(mydate)
+[1] "Thursday"
+
+> months(mydate)
+[1] "January"
+
+> quarters(mydate)
+[1] "Q1"
+
+> format(mydate, "%Y")        # No generic function for Year
+[1] "1970"
+```
+
+## Coerce strings to dates and times
+- Often, dates and times are written in different formats when you retrieve data
+- There are several functions that allow you to coerce dates in non-R format
+to an R-date object
+
+```r
+> as.Date("02/27/92", "%m/%d/%y")
+[1] "1992-02-27"
+
+> as.Date("1jan1960", "%d%b%Y")
+[1] "1960-01-01"
+
+> strptime("02/27/92", "%m/%d/%y") # Check ?strptime for details
+[1] "1992-02-27 GMT"
+
+> strptime("December 31, 2015 23:40:59", "%B %d, %Y %H:%M:%S")
+[1] "2015-12-31 23:40:59 GMT"
+
+```
+
+
+## Operations on dates and times
+- You can perform some mathematical operations (only `+` and `-`), and evaluate 
+logical conditions on dates and times (e.g. `==` and `<=`)
+
+```r
+> start <- strptime("2016-03-06 10:00:00", "%Y-%m-%d %H:%M:%S")
+> end   <- strptime("2016-04-07 17:00:09", "%Y-%m-%d %H:%M:%S") 
+
+> end - start
+Time difference of 32.2501 days
+
+> end > start
+[1] TRUE
+
+> start + 1 # adds 1 sec
+[1] "2016-03-06 10:00:01 GMT"
+```
+- **How would you add one day to the start date?**
+
+
+## Operations on dates and times
+- `R` keeps track of leap years, leap seconds, daylight savings, and time 
+zones!
+
+```r
+> start <- as.Date("2016-02-01"); end <- as.Date("2016-03-01") 
+
+> end - start
+Time difference of 29 days
+
+> (ny <- strptime("2016-03-06 10:00:00", "%Y-%m-%d %H:%M:%S", 
+                  tz="America/New_York"))
+[1] "2016-03-06 10:00:00 EST"
+
+> (nrw <-  strptime("2016-03-06 10:00:00", "%Y-%m-%d %H:%M:%S"))
+[1] "2016-03-06 10:00:00 GMT"
+
+> ny-nrw
+Time difference of 5 hours
+```
+
+# End of Part II
+
+

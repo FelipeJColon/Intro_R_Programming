@@ -1,0 +1,1362 @@
+---
+title: "Introduction to Programming with R"
+author: |
+       | Felipe J Colon-Gonzalez
+       | School of Environmental Sciences
+date: "8-9 November 2016"
+output: 
+     ioslides_presentation:
+          logo: UEA_NEW_BRAND_Green.png
+---
+
+
+## Overview
+0. Introduction 
+1. Entering and Evaluating Input
+2. Object types and their features
+       - Numbers and Vectors
+       - Matrices
+       - Lists
+       - Data frames
+
+
+# 0. Introduction
+
+## What is R?
+- R is a suite of software facilities for data manipulation, calculation and 
+graphical display
+- A vehicle for developing methods for interactive data analysis
+- Fast developing with thousand of contributors around the world
+- An environment where classical and modern statistical techniques can be 
+implemented
+
+## Why R?
+1. With R you can do  [almost anything you need](http://www.rstudio.com/products/shiny/shiny-user-showcase//) 
+for data analysis
+
+2. R runs on **almost any** standard computing platform and operating system
+
+3. It is **_free and open source!_** so it creates a platform to allow users 
+develop new things
+       - There are over 4000 packages developed by users from around the world.
+
+4. There are frequent and regular releases so bugs are constantly addressed
+
+5. It has sophisticated graphic capabilities that allow generating **_publication
+quality_** graphics
+
+
+## An Example
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+require(plotly)
+p <- plot_ly(iris, x = ~Sepal.Width, y = ~Sepal.Length) 
+add_markers(p, color = ~Species, size = ~Petal.Length)
+```
+
+## Some limitations
+
+1. It is **_memory expensive_** (i.e. objects are stored in physical [RAM] 
+memory)
+       - although progress has been made to address the issue
+
+2. Most packages are **_developed based on demand_** and user contributions
+       - If the method you are interested in is not available, you will need to
+       either implement it, ask someone to do so, or look for an alternative
+       software
+
+4. Some packages **_duplicate functions_** previously developed in well 
+documented packages
+3. Several packages contributed by users are **_poorly documented_** (although
+this has improved substantially)
+
+# 1. Entering and Evaluating Input
+
+
+## Open R Studio
+- I would **_strongly_** encourage you to keep `R Studio` open over the whole
+session
+- **_Feel free to play_** with the code during the session, you can always 
+catch up with the slides at a later point!
+
+![](rstudio2.png)
+
+## Typing data into the console
+- The R Console is the place where all operations are evaluated
+- The simplest way is to type in the operation you want to evaluate
+
+```r
+> 2 + 2 
+[1] 4
+```
+<br>
+- The number in brackets `[1]` indicates the result of the evaluated function
+and tells you that `4` is the first element (and in this case the only element)
+of the output
+- The output is **not stored** into the memory because the operation was not 
+**assinged** to any `object`
+
+## The Assignment Operator
+- By convention, the assignment operator in R `"<-"` 
+- You may alternatively use `=` but I would not recommend it
+
+```r
+> a <- 2 + 2     # Accepted by convention
+
+> a = 2 + 2      # Operationally the same but not recommended
+```
+<br>
+- Notice that the output is not printed unless you type the name
+of the object where the output is stored
+
+## Evaluation
+- When expressions are evaluated, their result is returned
+- Such result `may or may not` be automatically printed to the console depending 
+on how the expression is entered
+
+```r
+> x <- 1:10     # Nothing printed
+
+> x             # Auto-printing
+ [1]  1  2  3  4  5  6  7  8  9 10
+
+> (x <- 1:10)   # Auto-printing
+ [1]  1  2  3  4  5  6  7  8  9 10
+
+> print(x)      # Explicit printing
+ [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+## R Syntax
+- R is **_case sensitive_** (so `A` and `a` **_are different objects_**)
+
+```r
+> a <- 2 + 2 
+> A
+Error: object 'A' not found
+```
+
+<br>
+- Normally **_all alphanumeric symbols are allowed_** plus `.` and `_`
+
+```r
+> mydata  <- 2 * 3
+
+> my.data <- 2 + 2 
+
+> my_data <- 3 * 2
+
+```
+
+## R Syntax
+- Object names **_must start_** with `"."` or a letter
+- If they start with `.` the second character **_cannot be a digit_**
+
+```r
+> 12obs <- 1:12
+Error: unexpected symbol in "12obs"
+
+> .12obs
+Error: unexpected symbol in ".12obs"
+
+> .obs12 <- 1:12
+```
+<br>
+- Object names are unlimited in length 
+
+```r
+Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch <- 1
+```
+
+## Commands
+- Consecutive commands should be separated either by a semi-colon `;`, or by 
+a new line
+
+```r
+> a <- 1 + 3 ; b <- 2 + 2
+```
+<br>
+- If a command is not complete at the end of a line, R will give a different 
+prompt (`+`) on the subsequent line(s) and will continue to read input 
+**_until the command is syntactically complete_**
+
+```r
+> a <- 1 +
++ 
++ 
++ 2
+> a
+[1] 3
+```
+
+## R Syntax
+- Blank spaces are typically not an issue but abusing them 
+decreases the readability of your code
+- You may be interested in reading the 
+[Advanced R](http://adv-r.had.co.nz/Style.html) style guide for examples of 
+good coding practice
+
+```r
+> x <- 1:10              # OK
+
+> x<-1:10                # Too little space 
+
+> x <- 1    :    10      # Way too much!
+
+> x <- c (TRUE,FALSE)    # OK
+
+> x <- c (TRUE, FALSE)   # OK
+
+> x    <-    c ( TRUE   ,  FALSE  )    # Too much!
+```
+
+## Comments
+- Comments are useful to remember what you are doing and why
+- The `#` character indicates a comment
+- Anything to the right of `#` (and the `#` itself) **is ignored**
+- The `#` **_is the only comment character recognized by_** `R`
+- Unless you have an exceptional memory, I would advise you **document every
+step of your analysis** (it'll save you lots of headaches!)
+
+## Comments
+
+```r
+## ------------------------------------------
+## Evaluate the effect of supplement type
+## on tooth growth
+## ------------------------------------------
+# Load data
+> require(datasets)
+> data(ToothGrowth)
+
+# Compute summary statistics table
+> myStats <- summary(ToothGrowth)
+
+# Show data structure
+> str(ToothGrowth)
+
+# Generate exploratory plot by supplement type
+> boxplot(len ~ supp, col=c("tomato", "steelblue"), data=ToothGrowth)
+```
+
+## Listing and Removing Objects
+- During a session all objects are created and stored by name
+- The `ls()` command allows you to display the names of
+most (or all depending on how many there are) objects stored in memory
+- The collection of objects stored is called the **workspace**
+- You can remove objects from the workspace with `rm()`
+
+```r
+> ls()
+[1] "dfr" "i"   "m"   "msg" "x"  
+
+> rm(x)
+
+> ls()
+[1] "dfr" "i"   "m"   "msg"
+```
+
+## Basic Operations
+- You can perform all basic arithmetic and statistical operations in R
+without having to call functions other than those pre-installed
+
+```r
+> 2 + 2
+
+> 3 * 2 
+
+> 6 / 2
+
+> 6 ^ 2
+
+> sqrt(9 * pi)
+```
+
+## Basic Operations
+- You can perform all basic arithmetic and statistical operations in R
+without having to call functions other than those pre-installed
+
+```r
+> x <- rnorm(10)
+> mean(x)
+> median(x)
+> var(x)
+> sd(x)
+> range(x)
+> min(x)
+> max(x)
+> sin(x)
+> cos(x)
+> tan(x)
+```
+
+
+## Getting Help
+- To get help or more information on any specific **named** function or dataset 
+within a package, you can use the `help(myFunction)` or `?myFunction`
+- Special character functions must be enclosed in quotes, for example `help("[[")`
+- The `??` operator searches help for functions from packages not installed or 
+loaded
+- You can call examples using `example(myFunction)`
+
+```r
+> ?rnorm               
+
+> ??dlnm
+
+> example(rnorm)
+```
+
+## Example Help Page
+
+![width](rnorm.png)
+
+## Getting Help
+- When you get error messages `Google` is **your best friend!**
+
+```r
+> rnorm(2 x 3)
+Error: unexpected symbol in "rnorm(2 x"
+```
+<br>
+![width](google.png)
+
+
+## Warnings Are Not Errors!
+- `Warnings` are the way R tells you that there might be issues with your input
+or specifications
+- The computation could be flawed
+
+```r
+> sqrt(-2)
+[1] NaN
+Warning message:
+In sqrt(-2) : NaNs produced
+```
+
+# 2. Object Types
+
+## Object Types 
+- Everything in R is an **object**
+- The most commonly used object types in R are:
+     - Vectors
+     - Matrices
+     - Lists
+     - Data Frames 
+
+## Vectors
+- The simplest object type is the `vector`
+- They are the building blocks of other object types
+     - Most of their features apply to the other object types
+- A vector is a sequence of elements **of the same type**
+- The most common basic vector types are: logical, numeric, integer, character
+(string), and factor (categorical)
+- Vectors can have any length (restricted by your computer's memory)
+
+
+## Example Vectors
+
+```r
+> (myVector <- 1:10)
+[1]  1  2  3  4  5  6  7  8  9 10       # Numeric
+
+> (myVector <- letters[1:5])
+[1] "a" "b" "c" "d" "e"                 # Character 
+
+> (myVector <- c(TRUE, FALSE, TRUE))
+[1]  TRUE FALSE TRUE                    # Logical
+```
+
+
+## Numeric Vectors
+- Numeric are the most common vector type
+- Objects may be concatenated into a vector using `c()` 
+- Numeric vectors may also be generated using `":"` 
+
+```r
+> (myNumbers <- 1:5)
+[1] 1 2 3 4 5
+
+> (fieldData <- c(1, 3, 5, 12, 1, 4, 9))
+[1]  1  3  5 12  1  4  9
+```
+
+## Character Vectors
+- Character vectors can be very useful for data analysis
+- Often, they are used as plot labels and column names
+- They **MUST** be entered using matching double (`""`) or single (`''`) quotes 
+
+```r
+> (x <- c("a", "b", "c"))
+[1] "a" "b" "c"
+
+> x <- c(z, w, k)
+Error: object 'z' not found
+
+> (gender <- c("male", "female", "female", "male"))
+[1] "male"   "female" "female" "male"
+```
+
+## Character Vectors
+- Character objects can also be concatenated using `paste()`
+
+```r
+>  c("R", "is", 'cool')            # Output with 3 elements
+[1] "R"    "is"   "cool"
+
+> paste("R", "is", "cool")         # Output with 1 element
+[1] "R is cool"
+
+> paste0("R", "is", "cool")
+[1] "Riscool"
+
+> paste("R", "is", "cool", sep="-")
+[1] "R-is-cool"
+
+> paste("R", "is", "cool", sep=".")
+[1] "R.is.cool"
+```
+
+## Character Vectors
+- Sometimes you may want to create character vectors concatenating **two vectors**
+- This may be very useful when you need to add a **prefix** to your data
+
+```r
+> paste("Sample", 1:5)             # Notice the blank spaces 
+[1] "Sample 1" "Sample 2" "Sample 3" "Sample 4" "Sample 5"
+
+> paste("Sample", 1:5, sep="")     # Similar to paste0()
+[1] "Sample1" "Sample2" "Sample3" "Sample4" "Sample5"
+
+> paste0("Site", LETTERS[1:5]) 
+[1] "SiteA" "SiteB" "SiteC" "SiteD" "SiteE"
+
+```
+
+## Character Vectors
+
+```r
+> paste("Today is", date())
+[1] "Today is Tue Nov  8 08:07:48 2016"
+
+> x <- 1:7; y <- letters[1:4]
+
+> paste0(x, y) # Notice the recycling of elements in y
+[1] "1a" "2b" "3c" "4d" "5a" "6b" "7c"
+```
+
+## Factors
+- They are categorical variables (i.e. variables that can take one of a limited
+number of values)
+
+```r
+(myData <- c(2, 2, 1, 2, 2, 1, 1, 2, 2, 1))
+[1] 2 2 1 2 2 1 1 2 2 1
+
+(myData <- factor(myData))
+[1] 2 2 1 2 2 1 1 2 2 1
+Levels: 1 2
+
+(myData <- factor(myData, labels=c("male", "female")))
+[1] female female male female female male male female female male 
+Levels: male female
+
+plot(myData)
+```
+
+## Logical Vectors
+- Logical vectors can take the values `TRUE`, `FALSE`, or `NA` ("not available")
+- The first two may be abbreviated `T` and `F` (better to use `TRUE`/`FALSE`)
+- Logical vectors can be generated by conditions using the following functions:
+       - `<` and `>` 
+       - `<=` and `>=`
+       - `==` (exact equality)
+       - `!=` (inequality)
+       - `&` (and) 
+       - `|` (or)
+       
+
+## Logical Operators
+
+```r
+> 1:5 < 3
+[1]  TRUE  TRUE FALSE FALSE FALSE
+
+> x <- 1:10
+
+> x > 8               # Values of "x" greater than 8
+[1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE
+ 
+> x <= 5               # Values of "x" lower than or equal to 5
+[1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE
+
+> x > 8 | x < 5       # Values of "x" greater than 8 OR lower than 5
+[1]  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE  TRUE  TRUE
+
+> x > 5 & x < 8       # Values of "x" greater than 5 AND lower than 8
+[1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE
+```
+
+## Logical Operators
+
+```r
+> x <- 1:11 ; y <- 11:1
+
+> x == y              # Evaluate exact equality
+[1] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+ 
+> x != y               # Inequality
+[1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE
+
+```
+
+## Vector Operations
+- Arithmetic operations are performed **element by element**
+- Vectors **do not have** to be of the same length for arithmetic operations
+- If they aren't, the shortest vector is **recycled** as required until they 
+match the length of the longest vector
+
+```r
+> x <- 10:1
+
+> y <- 1:3
+
+> (v <- x + y)
+Warning message:
+In x + y : longer object length is not a multiple of shorter
+object length
+ [1] 11 11 11  8  8  8  5  5  5  2
+```
+
+## Logical Vector Arithmetics
+- Logical vectors may be used in arithmetic operations
+- If so, they are coerced into numeric vectors:
+       - `FALSE` takes the value **0** and `TRUE` the value **1**
+
+```r
+> x <- c(TRUE, FALSE, TRUE, FALSE, TRUE)
+
+> sum(x)
+[1] 3
+```
+
+
+## Mixing objects of different types
+- R objects may get mixed either by accident or intentionally
+- It is recalled that this **is not allowed in R**
+- R uses **implicit coercion** to represent of objects in a sensible manner
+
+```r
+> c(2, "A", "B")         # Character
+[1] "2" "A" "B"
+
+> c(TRUE, FALSE, 3)      # Numeric
+[1] 1 0 3
+
+> c('A', "B", FALSE)     # Character
+[1] "A" "B" "FALSE"
+```
+
+## Explicit coercion
+* You can **explicitly coerce** objects from one class to another using 
+`as.foo()` functions
+
+```r
+> x <- 0:5
+
+> class(x)
+[1] "integer"
+
+> as.numeric(x)
+[1] 0 1 2 3 4 5
+
+> as.logical(x)
+[1] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE
+
+> as.character(x)
+[1] "0" "1" "2" "3" "4" "5"
+```
+
+## Explicit coercion
+* If R cannot coerce an object, it will produce `NA` 
+
+```r
+> x <- c("a", "b", "c")
+
+> as.numeric(x)
+[1] NA NA NA
+Warning message:
+NAs introduced by coercion 
+
+> as.logical(x)
+[1] NA NA NA
+
+```
+
+## Regular Sequences
+- There are several options for generating vectors using of sequential numbers
+
+```r
+> 1:10              # Ascending
+ [1]  1  2  3  4  5  6  7  8  9 10
+ 
+> 10:1              # Descending
+ [1] 10  9  8  7  6  5  4  3  2  1
+
+> n <- 10
+> 1:n-1             # R reads (1:n)-1
+ [1] 0 1 2 3 4 5 6 7 8 9
+
+> 1:(n-1)
+[1] 1 2 3 4 5 6 7 8 9
+```
+
+## Regular Sequences...
+- The `seq()` function is also commonly used to generate regular sequences (see `?seq`)
+- It has several arguments but you may only need to specify a couple 
+       - The first two arguments specify the beginning and end of the sequence
+       - If only these two arguments are specified, **_the result is equivalent 
+       to using the colon operator_**
+
+```r
+> 1:5
+[1] 1 2 3 4 5
+
+> seq(1, 5)
+[1] 1 2 3 4 5
+```
+
+## Regular Sequences...
+- The arguments of `seq()` (and any other R function) can be given in a **named**
+form
+- When names are provided, the order in which they appear is **irrelevant** 
+
+```r
+> seq(2, 4)
+[1] 2 3 4
+
+> seq(from=2, to=4)
+[1] 2 3 4
+
+> seq(to=4, from=2)
+[1] 2 3 4
+```
+
+## Other seq() arguments
+- There are other two very useful arguments to `seq()` 
+       * `by=value`, which specifies the step size
+       * `length.out=value`, which defines the length of the sequence
+- If none is provided, the default `by=1` is assumed
+
+```r
+> seq(from=2, to=5, by=0.5)        # From 2 to 5 with steps of 0.5
+[1] 2.0 2.5 3.0 3.5 4.0 4.5 5.0
+
+> seq(from=2, to=5, length.out=5)  # From 2 to 5 with length 5
+[1] 2.00 2.75 3.50 4.25 5.00
+
+> seq(5)                    # Sequence of length 5, step size = 1
+[1] 1 2 3 4 5
+```
+
+## Replicating Objects
+- Sometimes you may want to replicate a particular value to create a vector
+- The `rep()` function is can be used to replicate objects in several ways
+
+```r
+> rep(1:4, times=2)
+[1] 1 2 3 4 1 2 3 4
+
+> rep(1:4, each=2)
+[1] 1 1 2 2 3 3 4 4
+
+> rep(1:4, times=c(1, 2, 2, 1))
+[1] 1 2 2 3 3 4
+
+> rep(1:4, each=2, len=10)    # Notice only the 1's are recycled
+ [1] 1 1 2 2 3 3 4 4 1 1
+```
+<br>
+- Type `?rep` for more examples
+
+
+## Missing values
+- When elements of a vector are **_not available_** or are **_missing_**, 
+a place within the vector is given for them by assigning them the special values 
+`NA` or `NaN` (not a number, for undefined maths operations)
+- Any operation performed on `NA` elements results in an `NA` because the result 
+cannot be known, and hence is not available
+- The `is.na()` function evaluates if an element of x is an `NA`
+- `is.nan()` evaluates if an element of _x_ is an `NaN`
+- When the `is.na()` or `is.nan()` functions are applied to a vector, they 
+return a logical vector of the same length, containing `TRUE` for `NA` or `NaN`, 
+and `FALSE` otherwise.
+
+## Missing values
+
+<br>
+```r
+> x <- c(1, 2, 3, NA)
+> x
+[1]   1   2   3  NA 
+
+> is.na(x) # NA result in TRUE
+[1] FALSE FALSE FALSE  TRUE
+
+```
+
+## Missing values
+- Depending on the function, the presence of an `NA` may, or may not be an 
+issue
+
+```r
+> x <- c(1, 2, NA, 4, 5)
+
+> sum(x)
+[1] NA
+```
+<br>
+- The same happens with functions like `mean`, `min`, `max`, `sd` and many 
+others
+- To understand why we get `NA` for the sum of the head values, type
+`?sum` 
+
+
+## Missing values
+- The default option `na.rm = FALSE` results in an `NA` if there is a missing 
+value in the vector (`rm` stands for "remove")
+- To prevent this behaviour, set `na.rm = TRUE`
+
+```r
+> x <- c(1, 2, NA, 4, 5)
+
+> sum(x, na.rm=TRUE)
+[1] 12
+```
+
+# 3. Matrices
+
+
+## Matrices
+- Matrices are **multidimensional vectors** that have a dimension attribute
+- Their dimension attribute is a non-negative integer vector of length 2 that 
+indicates the number of rows and columns
+- The number of elements in a matrix **should** be equal to the product of 
+`nrow` * `ncol`
+
+## Matrices
+- All elements of a matrix **MUST** be of the same type (numeric, character)
+- Matrices are typically created **column-wise**, and so they start from the 
+upper left corner and run down the columns
+- They can also be created **row-wise** setting the argument `byrow=TRUE`
+- Matrices can be created with the `matrix()` function or by adding a dimension 
+attribute to a vector
+
+
+## Matrices
+
+```r
+> matrix(1:10, nrow=2, ncol=5)
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    3    5    7    9
+[2,]    2    4    6    8   10
+
+> matrix(1:10, nrow=2, ncol=5, byrow=TRUE)
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    2    3    4    5
+[2,]    6    7    8    9   10
+
+> matrix(1:10, nrow=2, ncol=6)
+    [,1] [,2] [,3] [,4] [,5] [,6]
+[1,]   1    3    5    7    9    1
+[2,]   2    4    6    8   10    2
+Warning message:
+In matrix(1:10, nrow = 2, ncol = 6) :
+  data length [10] is not a sub-multiple or multiple of the
+  number of columns [6]
+```
+
+
+## Matrices
+
+```r
+> x <- 1:10
+> dim(x) <- c(5, 2)
+
+> x
+     [,1] [,2]
+[1,]    1    6
+[2,]    2    7
+[3,]    3    8
+[4,]    4    9
+[5,]    5   10
+
+```
+
+
+## Alternative Ways to Create Matrices
+- Matrices can be created from other vectors or matrices using `cbind()`
+or `rbind()` 
+- If elements are shorter than required, they will be recycled (whenever possible)
+
+## Alternative Ways to Create Matrices
+
+```r
+> x <- 1:3; y <- 8:10
+> cbind(x, y)
+     x  y
+[1,] 1  8
+[2,] 2  9
+[3,] 3 10
+
+> x <- 1:4; y <- 8:10
+> rbind(x, y)
+  [,1] [,2] [,3] [,4]
+x    1    2    3    4
+y    8    9   10    8
+Warning message:
+In rbind(x, y) : number of columns of result is not a multiple of 
+vector length (arg 2)
+```
+
+## Matrix attributes
+* All matrices have the following attributes:
+       * dimension, nrow, ncol, length, class
+* Additionally, they may have colnames and rownames
+
+```r
+> dim(m)
+[1] 5 2
+
+> nrow(m); ncol(m) 
+[1] 5
+[1] 2
+
+> length(m); class(m)
+[1] 10
+[1] "matrix"
+```
+
+
+## Matrix attributes
+
+```r
+> colnames(m) <- c("alpha","beta")      # Assign column names
+
+> rownames(m) <- c("Jan","Feb","Mar","Apr","May") # Assign row names
+
+> m
+    alpha beta
+Jan     1    6
+Feb     2    7
+Mar     3    8
+Apr     4    9
+May     5   10
+
+> colnames(m)                           # Retrieve column names
+[1] "alpha" "beta" 
+
+> rownames(m)                           # Retrieve row names
+[1] "Jan" "Feb" "Mar" "Apr" "May"
+```
+
+
+## Vector and Matrix Arithmethics
+- Expressions are scanned from left to right
+- Vectors **cannot** be longer than the matrix. If shorter, they are recycled
+
+```r
+> m <- matrix(1:10, 5, 2) ; v <- 1:4
+
+> m + v
+     [,1] [,2]
+[1,]    2    8
+[2,]    4   10
+[3,]    6   12
+[4,]    8   10
+[5,]    6   12
+Warning message:
+In m + v : longer object length is not a multiple of shorter
+object length
+```
+
+
+## Transposing a matrix
+- In some cases, you may need/want to transpose a matrix
+- This operation can be done with the `t()` function
+
+```r
+> m 
+     [,1] [,2]
+[1,]    1    6
+[2,]    2    7
+[3,]    3    8
+[4,]    4    9
+[5,]    5   10
+
+> t(m)
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    2    3    4    5
+[2,]    6    7    8    9   10
+```
+
+# 4. Data Frames
+
+## Data Frames
+- Data frames are one of the most commonly used type of object because they are
+used to store **tabular data**
+- Elements are stored in columns
+     - Each column **MUST have** the same number of rows
+- Data frames can store objects of **different classes**
+     - The constituents of each column, however, must be **of the same class**
+
+
+## Creating Data Frames
+- Data frames may be created with the `data.frame()` function, or can be coerced 
+from other object types
+- By default, character objects are **coerced to factors** 
+
+```r
+> (dfr <- data.frame(foo=1:2, bar=c(TRUE, FALSE), qux=letters[1:2]))
+  foo   bar qux
+1   1  TRUE   a
+2   2 FALSE   b
+
+> m <- matrix(1:4, nrow=2, ncol=2)
+> as.data.frame(m)
+  V1 V2
+1  1  3
+2  2  4
+```
+
+## Inspecting a data frame
+- Data frames can be inspected using `str()` and `attributes()`
+
+```r
+> str(dfr)
+'data.frame':	2 obs. of  3 variables:
+ $ foo: int  1 2
+ $ bar: logi  TRUE FALSE
+ $ qux: Factor w/ 2 levels "a","b": 1 2
+
+> attributes(dfr)
+$names
+[1] "foo" "bar" "qux"
+
+$row.names
+[1] 1 2
+
+$class
+[1] "data.frame"
+```
+
+## Accessing Data 
+- The most common way is to use the `"$"` operator
+- When using `"$"` you **must** indicate both the name of the data frame 
+and the name of the variable of interest
+     - This may be tedious or inconvenient when performing multiple operations 
+     with multiple variables
+
+```r
+> dfr <- data.frame(foo=1:5, bar=3:7, qux=6:10)
+> dfr$foo
+[1] 1 2 3 4 5
+
+> dfr$qux
+[1]  6  7  8  9 10
+
+> dfr$foo * dfr$ bar - dfr$qux
+[1] -3  1  7 15 25
+```
+
+## Accessing Data 
+- An alternative is to use the `with()` function when performing multiple 
+operations
+
+```r
+> dfr$foo * dfr$bar - dfr$qux
+[1] -3  1  7 15 25
+
+> with(dfr, foo * bar - qux)  
+[1] -3  1  7 15 25
+```
+
+## Column and Row Names
+- All columns in a data frame have a name
+- You may assign column names or accept the defaults
+- Row names may also be assigned when required
+
+```r
+> dfr <- data.frame(1:5, 3:7, 6:10); colnames(dfr); rownames(dfr)
+[1] "X1.5"  "X3.7"  "X6.10"
+[1] "1" "2" "3" "4" "5"
+
+> colnames(dfr) <- c("alpha", "beta", "gamma")
+> rownames(dfr) <- c("rock", "paper", "scissors","lizzard", "spock")
+> dfr
+         alpha beta gamma
+rock         1    3     6
+paper        2    4     7
+scissors     3    5     8
+lizzard      4    6     9
+spock        5    7    10
+```
+
+## Adding Elements
+- You may add elements to a data frame using the `"$"` operator
+
+```r
+> dfr$delta <- 21:25
+> dfr
+         alpha beta gamma delta
+rock         1    3     6    21
+paper        2    4     7    22
+scissors     3    5     8    23
+lizzard      4    6     9    24
+spock        5    7    10    25
+```
+
+
+# 5. Lists
+
+## Lists
+- They are ordered collection of objects that **may NOT** be of the same type
+- The function `length()` gives the number of components of the list 
+
+```r
+> lst <- list(letters[1:5], 1:8, c(TRUE,FALSE))
+> lst
+[[1]]
+[1] "a" "b" "c" "d" "e"
+
+[[2]]
+[1] 1 2 3 4 5 6 7 8
+
+[[3]]
+[1]  TRUE FALSE
+```
+
+## Concatenate Lists
+- You may use `c()` to concatenate lists
+- When concatenating lists, the output is also a list
+
+```r
+> lstA <- list(1:3) 
+> lstB <- list(c(TRUE, FALSE), 4.4^3*43-1)
+> lstC <- c(lstA, lstB)
+
+> lstC         
+[[1]]
+[1] 1 2 3
+
+[[2]]
+[1]  TRUE FALSE
+
+[[3]]
+[1] 3661.912
+```
+
+## Appending to Lists
+- You may append extra elements to a list using the `"[]"` operator
+
+```r
+> lst     <- list(1:4)
+> lst[3]  <- list(1+0i)
+
+> lst      
+[[1]]
+[1] 1 2 3 4
+
+[[2]]
+NULL
+
+[[3]]
+[1] 1+0i
+```
+
+## Named Elements of Lists
+- In some cases you may want to give names to each element of a list
+
+```r
+> lst <- list(numeric=1:4, 
+             character=letters[1:10],
+             factor=as.factor(c("siteA", "SiteB", "SiteC")),
+             matrix=matrix(rnorm(4), 2, 2), 
+             list=list(1e3))
+```
+
+
+# Indexing and Subsetting
+
+## Indexing 
+- Indices are extremely useful tools for creating subsets of an object 
+- Typically, they consists of numeric vectors within the `"[]"` operator
+- Indices can be logical, positive, negative, or character strings
+
+## Indexing Examples
+
+```r
+> x <- c(-1, 0, 2, NA, NaN, 6)
+
+> x[2]                      # Retrieve the second element of x
+
+> x[1:5]                    # Gives the first five elements of x
+[1]  -1   0   2  NA NaN
+
+> x[-(1:3)]                 # Negative indexing 
+[1] 0 0 6
+
+> x[(!is.na(x)) & x > 0]    # Elements of x when x !is.na AND x > 0
+[1] 2  6
+```
+
+## Indexing 
+- Indices could be useful when you need/want to replace a value in your set
+
+```r
+> x[is.na(x)] <- -999         # Set missing values in x to -999
+> x
+[1] -1  0  2  -999  -999  6
+
+> x[x == -999] <- 0           # Set -999 to zero
+> x
+[1] -1  0  2  0  0  6
+```
+
+## Character Indices
+- Character indices could be used when you have **named** elements in an object
+
+```r
+> names(x) <- c("alpha", "beta", "gamma", "delta", "epsilon", "mu")
+
+> x[c("alpha", "gamma")]  
+alpha gamma 
+  -1    2 
+   
+> index <- c("beta", "mu")
+> x[index]
+beta   mu 
+   0    6
+   
+> x[names(x) != "delta"]      # Negative indices do not work with characters
+alpha    beta   gamma   epsilon     mu 
+     -1      0      2      0      6 
+```
+
+## Truncating Vectors
+- Indices could be very useful for truncating a vector
+
+```r
+> set.seed(123)
+> x <- rnorm(10) # Vector of length = 10
+
+> x <- x[2 * 1:5] # Reduce to length=5 retaining only even indices 
+> x
+[1] -0.23017749  0.07050839  1.71506499 -1.26506123 -0.44566197
+
+> length(x) <- 3 # Truncate vector to length=3
+> x
+[1] -0.23017749  0.07050839  1.71506499 
+```
+
+## Indexing for Matrices 
+- Indices can also be used with matrices
+
+```r
+> m <- matrix(1:10, nrow=2, ncol=5)
+> m
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    3    5    7    9
+[2,]    2    4    6    8   10
+
+> m[9]              # Extract 9th element
+[1] 9
+
+> m[1, 3]           # Get the element of m on row 1, column 3
+[1] 5
+
+> m[2,]             # Retrieve second row
+[1]  2  4  6  8 10
+```
+
+## Indexing for Matrices
+- Indices could also be used to assign or modify elements of a matrix
+
+```r
+> (m <- matrix(nrow=2, ncol=2))    # Empty matrix
+     [,1] [,2]
+[1,]   NA   NA
+[2,]   NA   NA
+
+> m[ ,1] <- c(27.2, 14.5)          # Filling column 1
+> m
+     [,1] [,2]
+[1,] 27.2   NA
+[2,] 14.5   NA
+
+> m[1 ,2] <- c(19.8)               # Fill 1st element of column 2
+> m
+     [,1] [,2]
+[1,] 27.2 19.8
+[2,] 14.5   NA
+```
+
+## Indexing and Subsetting Data Frames
+- Numeric and character indices could be used to produce subsets of particular
+rows and columns
+
+```r
+> dfr <- data.frame(foo=1:5, "bar"=6:10, "qux"=11:15)
+
+> dfr[ ,2]               # Subset all rows of column 2 (vector)
+[1]  6  7  8  9 10
+
+> dfr["foo"]             # Retrieve variable "foo" (data.frame)
+  foo
+1   1
+2   2
+3   3
+4   4
+5   5
+
+```
+
+## Indexing and Subsetting Data Frames
+
+```r
+> dfr[c(1,3), ]
+ foo bar qux
+1   1   6  11
+3   3   8  13
+
+> dfr[1:3, ]     # Not the same as above, why?
+  foo bar qux
+1   1   6  11
+2   2   7  12
+3   3   8  13
+
+> dfr[1:3, "foo"]      
+[1] 1 2 3
+```
+
+## Conditional Subsetting
+- Subsets may also be produced by specifying conditions
+
+```r
+> x <- dfr[dfr$foo > 3, ]   # Assign columns when "foo" >  3 to "x"
+> x
+  foo bar qux
+4   4   9  14
+5   5  10  15
+
+> dfr[dfr$foo > 3 & dfr$bar == 9, ]  # What is the command asking?
+  foo bar qux
+4   4   9  14
+
+> dfr[dfr$foo >= 4 | dfr$qux > 12, c(1,3)]  
+  foo qux
+3   3  13
+4   4  14
+5   5  15
+```
+
+## Conditional Subsetting
+- An alternative way is to ise the `subset()` function
+
+```r
+> dfr[dfr$foo > 4, ]
+  foo bar qux
+5   5  10  15
+
+> subset(dfr, foo > 4) 
+  foo bar qux
+5   5  10  15
+
+> subset(dfr, foo >= 4 & bar != 9, select=c("bar", "qux"))
+  bar qux
+5  10  15
+```
+
+## Indexing for Lists
+- List subsets including one or multiple elements may be retrieved using
+the `"[]"` or `"$"` operators
+- Whilst `"[]"` can be used with indices, the `"$"` can **ONLY** be used 
+with literal names
+
+
+## Indexing for Lists
+
+```r
+> lst <- list(numeric=1:4, character=letters[1:10], 
+              logical=c(TRUE, FALSE, TRUE))
+
+> lst[1]                # Notice the output is also a list
+$numeric
+[1] 1 2 3 4
+
+> lst[c(1, 3)]          # Notice we use the c() command
+$numeric
+[1] 1 2 3 4
+
+$logical
+[1]  TRUE FALSE  TRUE
+```
+
+## Indexing for Lists
+
+```r
+> lst["logical"]
+$logical
+[1]  TRUE FALSE  TRUE         # Notice the output is a list
+
+> lst$logical
+[1]  TRUE FALSE  TRUE         # Notice the output is a vector
+
+> lst[3]
+$logical
+[1]  TRUE FALSE  TRUE
+
+> lst$3
+Error: unexpected numeric constant in "lst$3"
+```
+
+## Indexing for Lists
+- The `"[[]]"` opeartor is used to extract elements from a **single element**
+of a list
+- They may also be used to extract **nested elements** (e.g. the third 
+element of the first list member)
+
+```r
+> lst[[1]]               # Notice the result is a vector
+[1] 1 2 3 4
+
+> lst[[c(1, 3)]]         # Notice the difference with lst[c(1,3)]
+[1] 3
+
+> lst[[1]][[3]]          # Same as above
+[1] 3
+
+> lst[["numeric"]][[3]]  # Same as above
+[1] 3
+```
+
+## Indexing for Lists
+- Indices may be stored in another variable
+- This may come handy when you perform multiple operations
+
+```r
+> (lstNames <- names(lst))
+[1] "numeric"   "character" "logical"  
+
+> for(name in lstNames){      # Do the following for each "lstNames"
++     print(lst[[name]])      # print the member's components
++ }
+
+[1] 1 2 3 4
+[1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"
+[1]  TRUE FALSE  TRUE
+```
+
+# End of Part I
+
+
