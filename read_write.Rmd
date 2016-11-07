@@ -211,12 +211,6 @@ read as characters
 ## Reading small sets
 - For small to moderately sized datasets, you can usually call `read.table()` 
 or `read.csv()` without specifying any other arguments
-
-```r
-# Load the dummy dataset 
-mydata <- read.csv("mydata.csv")
-```
-
 - R will automatically:
 
        - skip lines beginning with `"#"`
@@ -224,6 +218,18 @@ mydata <- read.csv("mydata.csv")
        allocated)
        - figure out the type of variable in each column
 - Telling R all these things directly makes the code faster and more efficient
+
+## Let's download some data!
+
+```r
+# Load the dummy dataset 
+> url1  <- 'https://raw.githubusercontent.com/FelipeJColon/'
+> url2  <- 'Intro_R_Programming/master/mydata.csv'
+
+> myUrl <- paste0(url1, url2)
+
+> mydata <- read.csv(myUrl)
+```
 
 
 ## Reading large sets 
@@ -238,19 +244,19 @@ twice as fast
 
 ```r
 # Load the Dummy data 2 
+> url2  <- "Intro_R_Programming/master/traffic.csv"
+> myUrl <- paste0(url1, url2)
+
 > system.time(
-> myData <- read.csv("traffic.csv")
+> myData <- read.csv(myUrl)
 > )
    user  system elapsed 
   5.380   0.000   5.294 
   
-> sample   <- read.csv("traffic.csv", nrows=100)
-
+> sample   <- read.csv(myUrl, nrows=100)
 > classes  <- sapply(sample, class)
 
-> system.time(
-> myData2  <- read.csv("traffic.csv", colClasses=classes)
-> )                           
+> system.time(myData2  <- read.csv(myUrl, colClasses=classes))                           
    user  system elapsed  
   3.482   0.000   3.437 
 ```
