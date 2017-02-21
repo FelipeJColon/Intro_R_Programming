@@ -3,7 +3,7 @@ title: "Introduction to Programming with R"
 author: |
        | Felipe J Colon-Gonzalez
        | School of Environmental Sciences
-date: "8-9 November 2016"
+date: "20-21 February 2017"
 output: 
      ioslides_presentation:
           logo: UEA_NEW_BRAND_Green.png
@@ -794,31 +794,6 @@ In matrix(1:10, nrow = 2, ncol = 6) :
 ```
 
 
-## Alternative Ways to Create Matrices
-- Matrices can be created from other vectors or matrices using `cbind()`
-or `rbind()` 
-- If elements are shorter than required, they will be recycled (whenever possible)
-
-## Alternative Ways to Create Matrices
-
-```r
-> x <- 1:3; y <- 8:10
-> cbind(x, y)
-     x  y
-[1,] 1  8
-[2,] 2  9
-[3,] 3 10
-
-> x <- 1:4; y <- 8:10
-> rbind(x, y)
-  [,1] [,2] [,3] [,4]
-x    1    2    3    4
-y    8    9   10    8
-Warning message:
-In rbind(x, y) : number of columns of result is not a multiple of 
-vector length (arg 2)
-```
-
 ## Matrix attributes
 * All matrices have the following attributes:
        * dimension, nrow, ncol, length, class
@@ -1099,12 +1074,13 @@ NULL
 > x <- c(-1, 0, 2, NA, NaN, 6)
 
 > x[2]                      # Retrieve the second element of x
+[1] 0
 
 > x[1:5]                    # Gives the first five elements of x
 [1]  -1   0   2  NA NaN
 
 > x[-(1:3)]                 # Negative indexing 
-[1] 0 0 6
+[1] NA NaN 6
 
 > x[(!is.na(x)) & x > 0]    # Elements of x when x !is.na AND x > 0
 [1] 2  6
